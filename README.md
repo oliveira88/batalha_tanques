@@ -8,8 +8,20 @@ A parte em HTML/JS/CSS foi desenvolvida sobre o trabalho do ano passado, [Corrid
 
 O objetivo desse trabalho é controlar um tanque utilizando código em Prolog ([SWI-Prolog](https://www.swi-prolog.org/)) para que ele seja o único sobrevivente.
 Após isso, também será realizado uma disputa em sala de aula, com todos os trabalhos.
+<p align="center"><img src="screenshot-all.png"></p>
 
-<img src="screenshot.png" width="720px">
+Regras:
+* Cada tanque pode atirar uma bala por segundo;
+* Cada tanque começa com uma vida de 100 pontos;
+* Se bater nas laterais do ambiente ou em outro tanque, perde 2 pontos de vida por segundo que estiver em contato/atrito;
+* Se for atingido por uma bala, perde 10 pontos de vida.
+
+Teclas:
+* Setas do teclado: movimentação do tanque\
+  Obs.: só pode movimentar para a esquerda ou direita se estiver andando pra frente ou para trás.
+* Espaço ou ENTER: atira\
+  Obs.: só pode atirar uma bala por segundo.
+* Tecla "s": exibe e esconde o placar do jogo.
 
 ### Como configurar a execução do jogo
 
@@ -75,6 +87,16 @@ As linhas já estão explicadas, mas sendo mais claro, as opções são:
     vez(0, SENSORES, CONTROLES) :- obter_controles0(SENSORES,CONTROLES).
     vez(1, SENSORES, CONTROLES) :- obter_controles1(SENSORES,CONTROLES). 
     ```
+
+Adicionais:
+* mudar a velocidade e a vida dos tanques:
+  ```js
+   speed=1.5, // mude aqui a velocidade máxima dos tanques
+   score=100, // mude aqui a vida dos tanques
+  ```
+* ativar a visualização dos sensores dos tanques:
+  ```js
+  ```
 
 ### Como executar o servidor pelo Prolog
 
