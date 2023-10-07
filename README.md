@@ -9,7 +9,7 @@ A parte em HTML/JS/CSS foi desenvolvida sobre o trabalho do ano passado, [Corrid
 O objetivo desse trabalho é controlar um tanque utilizando código em Prolog ([SWI-Prolog](https://www.swi-prolog.org/)) para que ele seja o único sobrevivente.
 Após isso, também será realizado uma disputa em sala de aula, com todos os trabalhos.
 
-[screenshot.png](screenshot.png)
+<img src="screenshot.png" width="720px">
 
 ### Como configurar a execução do jogo
 
