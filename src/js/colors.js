@@ -1,6 +1,7 @@
-class Colors{
-    constructor(firstColor=0) {
-        this.colors=["LightBlue", "LightGreen", "LightYellow", "LightGrey", "LightPink", "LightSalmon", "LightSeaGreen",
+export class Colors {
+  constructor(firstColor = 0) {
+    //prettier-ignore
+    this.colors=["LightBlue", "LightGreen", "LightYellow", "LightGrey", "LightPink", "LightSalmon", "LightSeaGreen",
                     "LightCoral", "LightCyan", "Indigo  ", "Gold", "MediumSpringGreen",
                     "Linen", "Peru", "LemonChiffon", "SaddleBrown", "HoneyDew",
                     "Tan", "Brown", "PaleTurquoise", "Silver", "DimGrey", "OldLace", "PapayaWhip", "Cornsilk",
@@ -16,11 +17,11 @@ class Colors{
                     "Pink", "FloralWhite", "Snow", "Gainsboro", "FireBrick", "MediumOrchid", "Yellow", "NavajoWhite",
                     "PaleGreen", "Cyan", "Lavender", "IndianRed ", "Sienna", "SlateGrey", "Wheat", "Chartreuse", "Aquamarine",
                     "Blue", "Azure", "Coral", "SeaGreen"];
-        this.colorPosition = firstColor%this.colors.length;
-    }
-    getColor() {
-        let pos = this.colorPosition;
-        this.colorPosition = (this.colorPosition+1)%this.colors.length;
-        return this.colors[pos];
-    }
+    this.colorPosition = firstColor % this.colors.length;
+  }
+  getColor() {
+    let pos = this.colorPosition;
+    this.colorPosition = (this.colorPosition + 1) % this.colors.length;
+    return this.colors[pos];
+  }
 }

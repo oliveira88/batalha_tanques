@@ -1,122 +1,123 @@
-# Batalha Tanques com Prolog
+# Tanks Battle with Prolog
 
-Trabalho Prático da Disciplina de Inteligência Artificial.
+Practical Work for the Artificial Intelligence Course.
 
-Este trabalho foi desenvolvido como trabalho prático da disciplina de Inteligência Artificial - 2023.
+This project was developed as a practical assignment for the Artificial Intelligence course - 2023.
 
-A parte em HTML/JS/CSS foi desenvolvida sobre o trabalho do ano passado, [Corrida em Prolog](https://github.com/jeiks/corrida_em_prolog), que tinha se baseado no código do *Radu Mariescu-Istodor*, disponível em seu [github](https://github.com/gniziemazity/Self-driving-car). 
+The HTML/JS/CSS part was built on top of last year's project, [Prolog Racing](https://github.com/jeiks/corrida_em_prolog), which was based on code by *Radu Mariescu-Istodor*, available on his [GitHub](https://github.com/gniziemazity/Self-driving-car).
 
-O objetivo desse trabalho é controlar um tanque utilizando código em Prolog ([SWI-Prolog](https://www.swi-prolog.org/)) para que ele seja o único sobrevivente.
-Após isso, também será realizado uma disputa em sala de aula, com todos os trabalhos.
+The objective of this project is to control a tank using Prolog code ([SWI-Prolog](https://www.swi-prolog.org/)) so that it becomes the last one standing. After that, a classroom competition will also take place with all the projects.
+
 <p align="center"><img src="screenshot-all.png"></p>
 
-Regras:
-* Cada tanque pode atirar uma bala por segundo;
-* Cada tanque começa com uma vida de 100 pontos;
-* Se bater nas laterais do ambiente ou em outro tanque, perde 2 pontos de vida por segundo que estiver em contato/atrito;
-* Se for atingido por uma bala, perde 10 pontos de vida.
+Rules:
+* Each tank can fire one bullet per second.
+* Each tank starts with 100 health points.
+* If it hits the sides of the environment or another tank, it loses 2 health points per second it is in contact/colliding.
+* If hit by a bullet, it loses 10 health points.
 
-Teclas:
-* Setas do teclado: movimentação do tanque\
-  Obs.: só pode movimentar para a esquerda ou direita se estiver andando pra frente ou para trás.
-* Espaço ou ENTER: atira\
-  Obs.: só pode atirar uma bala por segundo.
-* Tecla "s": exibe e esconde o placar do jogo.
+Keys:
+* Arrow keys: tank movement\
+  Note: it can only move left or right if it is moving forward or backward.
+* Spacebar or Enter: fires a bullet\
+  Note: it can only fire one bullet per second.
+* "s" key: shows or hides the game scoreboard.
 
-### Como configurar a execução do jogo
+### How to Configure the Game Execution
 
-Há várias formas de utilizar esse código, escolhendo colocar um tanque movido pelo teclado, nenhum ou vários tanques movidos aleatoriamente pelo JavaScript e nenhum ou vários tanques movidos pelo Prolog.
+There are various ways to use this code, choosing to include a tank controlled by the keyboard, none, or several tanks controlled randomly by JavaScript, and none or several tanks controlled by Prolog.
 
-Para isso, edite as seguintes linhas do arquivo  ``main.js``:
+To do this, edit the following lines in the `main.js` file:
 ```js
 const speed=1.5, arenaPadding=10, tankW=50, tankH=30,
-      score=100, // vida de cada tanque
-      dummyTanks=10, // quantidade de tanques aleatórios
-      keysTank=true, // modifique para ter um tanque controlado pelo teclado
-      // nome dos tanques controlados por Prolog (obs.: tem que adaptar o controle_tanques.pl ao mexer aqui)
-      // a quantidade é referente a quantidade de nomes, na falta de criatividade, o nome pode repetir... rs
-      // exemplos de dois:
-      //prologTanks=["Ligerin"], // escolha aqui o nome de seu tanque controlado por prolog
-      //prologTanks=["Ligerin", "ApagaFogo"], // se quiser colocar dois tanques prolog, faça assim
-      prologTanks=[], //se não quiser nenhum tanque prolog, faça assim
-      showSensors=false, //modifique para mostrar os sensores dos tanques PROLOG e KEYS
-      showSensorsOfDummyTanks=false; //modifique para mostrar os sensores dos tanques DUMMY
+      score=100, // tank health
+      dummyTanks=10, // number of randomly controlled tanks
+      keysTank=true, // modify to have a keyboard-controlled tank
+      // names of tanks controlled by Prolog (note: you must adapt controle_tanques.pl when making changes here)
+      // the quantity refers to the number of names; if you're lacking creativity, you can repeat names... hehe
+      // examples of two:
+      //prologTanks=["Ligerin"], // choose the name of your Prolog-controlled tank here
+      //prologTanks=["Ligerin", "ApagaFogo"], // if you want to add two Prolog tanks, do it like this
+      prologTanks=[], // if you don't want any Prolog tank, do it like this
+      showSensors=false, // modify to display the sensors of PROLOG and KEYS tanks
+      showSensorsOfDummyTanks=false; // modify to display the sensors of DUMMY tanks
 ```
 
-As linhas já estão explicadas, mas sendo mais claro, as opções são:
+The lines are already explained, but to be clearer, the options are:
 
-* **Ativar o controle de um tanque pelo teclado (setas do teclado e ENTER ou Espaço para atirar)**\
+* **Activate control of a tank with the keyboard (arrow keys and ENTER or Spacebar to fire)**\
   ```js
-  keysTank=true, // modifique para ter um tanque controlado pelo teclado
+  keysTank=true; // modify to have a tank controlled by the keyboard
   ```
-* **Modificar a quantidade de tanques controlados pelo JS (movimentos quase-aleatórios)**
+* **Change the number of tanks controlled by JS (almost-random movements)**
   ```js
-  dummyTanks=10, // quantidade de tanques aleatórios
+  dummyTanks=10; // number of randomly controlled tanks
   ```
-* **Não utilizar nenhum tanque controlado por Prolog**
+* **Do not use any tank controlled by Prolog**
   ```js
-  prologTanks=[], //se não quiser nenhum tanque prolog, faça assim
+  prologTanks=[]; // if you don't want any Prolog tank, do it like this
   ```
-* **Utilizar um tanque controlado por Prolog**
-  * No arquivo ``main.js``
+* **Use a tank controlled by Prolog**
+  * In the `public/main.js` file:
     ```js
-    prologTanks=["Ligerin"], // escolha aqui o nome de seu tanque controlado por prolog
-    //prologTanks=[], //se não quiser nenhum tanque prolog, faça assim
+    prologTanks=["Ligerin"]; // choose the name of your Prolog-controlled tank here
+    //prologTanks=[]; // if you don't want any Prolog tank, do it like this
     ```
-  * No arquivo ``controle_tanques.pl``
+  * In the `back/controle_tanques.pl` file:
     ```prolog
-    % deve existir um arquivo com o nome "tanque0.pl" ou "tanque0.pro" com o predicado obter_controles/2
+    % there must be a file named "tanque0.pl" or "tanque0.pro" with the predicate obter_controles/2
     :- use_module(tanque0, [obter_controles/2 as obter_controles0]).
-    % sempre deve-se iniciar pelo zero (0)
-    vez(0, SENSORES, CONTROLES) :- obter_controles0(SENSORES,CONTROLES).
+    % always start with zero (0)
+    vez(0, SENSORS, CONTROLS) :- obter_controles0(SENSORS,CONTROLS).
     ```
-* **Utilizar dois tanques controlados por Prolog**
-  * No arquivo ``main.js``
+* **Use two tanks controlled by Prolog**
+  * In the `public/main.js` file:
     ```js
-    prologTanks=["Ligerin", "ApagaFogo"], // se quiser colocar dois tanques prolog, faça assim
-    //prologTanks=["Ligerin"], // escolha aqui o nome de seu tanque controlado por prolog
-    //prologTanks=[], //se não quiser nenhum tanque prolog, faça assim
+    prologTanks=["Ligerin", "ApagaFogo"]; // if you want to add two Prolog tanks, do it like this
+    //prologTanks=["Ligerin"]; // choose the name of your Prolog-controlled tank here
+    //prologTanks=[]; // if you don't want any Prolog tank, do it like this
     ```
-  * No arquivo ``controle_tanques.pl``
+  * In the `back/controle_tanques.pl` file:
     ```prolog
-    % deve existir um arquivo com o nome "tanque0.pl" ou "tanque0.pro" com o predicado obter_controles/2
+    % there must be a file named "tanque0.pl" or "tanque0.pro" with the predicate obter_controles/2
     :- use_module(tanque0, [obter_controles/2 as obter_controles0]).
-    % deve existir um arquivo com o nome "tanque1.pl" ou "tanque1.pro" com o predicado obter_controles/2
+    % there must be a file named "tanque1.pl" or "tanque1.pro" with the predicate obter_controles/2
     :- use_module(tanque1, [obter_controles/2 as obter_controles1]).
-    % sempre deve-se iniciar pelo zero (0)
-    vez(0, SENSORES, CONTROLES) :- obter_controles0(SENSORES,CONTROLES).
-    vez(1, SENSORES, CONTROLES) :- obter_controles1(SENSORES,CONTROLES). 
+    % always start with zero (0)
+    vez(0, SENSORS, CONTROLS) :- obter_controles0(SENSORS,CONTROLS).
+    vez(1, SENSORS, CONTROLS) :- obter_controles1(SENSORS,CONTROLS). 
     ```
 
-Adicionais:
-* mudar a velocidade e a vida dos tanques:
+Additional:
+* Change the speed and health of the tanks:
   ```js
-   speed=1.5, // mude aqui a velocidade máxima dos tanques
-   score=100, // mude aqui a vida dos tanques
+   speed=1.5; // change the maximum speed of the tanks here
+   score=100; // change the tank's health here
   ```
-* ativar a visualização dos sensores dos tanques:
+* Activate the display of tank sensors:
   ```js
+  showSensors=true;
   ```
 
-### Como executar o servidor pelo Prolog
+### How to Run the Server with Prolog
 
-No momento que você adicionar tanques movidos pelo Prolog, você deve iniciar o servidor para que eles funcionem.
+Once you add tanks controlled by Prolog, you must start the server for them to work.
 
-Para isso,
-1. instale o [SWI-Prolog](https://www.swi-prolog.org/). Em distribuições baseadas na Debian (como Ubuntu), basta executar:
+To do this,
+1. Install [SWI-Prolog](https://www.swi-prolog.org/). On Debian-based distributions (like Ubuntu), simply run:
    ```sh
    sudo apt install swi-prolog
    ```
-2. faça o download do código:
+2. Download the code:
    ```sh
    git clone https://github.com/jeiks/batalha_tanques
    ```
-3. e execute o comando:
+3. Run the command:
    ```sh
    cd batalha_tanques
-   swipl -s servidor.pl (ou abra esse arquivo no swi-prolog)
+   swipl -s src/back/servidor.pl (or open this file in swi-prolog)
    ```
-   Ele já iniciará o servidor automaticamente e exibirá a seguinte mensagem:
+   It will automatically start the server and display the following message:
    ```
    --========================================--
 
@@ -125,69 +126,8 @@ Para isso,
 
    --========================================--
    ```
-4. abra o navegador e acesse [http://localhost:8080/](http://localhost:8080/) (eu testei tudo no Brave-Browser, compatível com Google Chrome).
+4. Open your browser and go to [http://localhost:8080/](http://localhost:8080/) (I tested everything on Brave Browser, compatible with Google Chrome).
    
-A implentação fornecida aqui está fornecendo dois tanques que tem movimentos aleatórios.
+The implementation provided here includes two tanks with almost-random movements.
 
-O primeiro é implementado no arquivo ``tanque0.pl`` e o segundo é uma cópia dele, com somente o número modificado, em ``tanque1.pl``.
-
-Ao adicionar mais tanques no ``main.js``, edite o arquivo ``controle_tanques.pl``, seguindo os exemplos já apresentados lá.
-
-Para implementar a "inteligência" dos tanques, edite e siga as intruções do arquivo ``tanque0.pl``  ou ``tanque1.pl``.
-
-### Como modificar o comportamento do tanque no Prolog
-
-Após modificar o ``main.js`` e o ``controle_tanques.pl``, edite o arquivo ``tanque0.pl``:
-```prolog
-% Tanque 0 -- "tanque0" para seguir o nome do arquivo
-:- module(tanque0, [obter_controles/2]).
-
-%% Explicação:
-% Sensores:
-% X: posição horizontal do tanque
-% Y: posiçao vertical do tanque
-% ANGLE: angulo de inclinacao do robo: 0 para virado para frente até PI*2 (~6.28)
-% Sensores: esquerda (S1,S2), centro (S3), direita (S4,S5), ré (S6)
-%   S1,S2,S3,S4,S5,S6: valores de 0 à 1, onde 0 indica sem obstáculo e 1 indica tocando o tanque
-% SCORE: inteiro com a "vida" do tanque. Em zero, ele perdeu
-% Controles:
-% [FORWARD, REVERSE, LEFT, RIGHT, BOOM]
-% FORWARD: 1 para ir pra frente e 0 para não ir
-% REVERSE: 1 para ir pra tras e 0 para não ir
-% LEFT: 1 para ir pra esquerda e 0 para não ir
-% RIGHT: 1 para ir pra direita e 0 para não ir
-% BOOM: 1 para tentar disparar (BOOM), pois ele só pode disparar uma bala a cada segundo
-% obter_controles([X,Y,ANGLE,S1,S2,S3,S4,S5,S6], [FORWARD, REVERSE, LEFT, RIGHT, BOOM]) :-
-%     FORWARD is 1,
-%     REVERSE is 0,
-%     LEFT is 1,
-%     RIGHT is 0,
-%     BOOM is 1.
-
-%%% Faça seu codigo a partir daqui, sendo necessario sempre ter o predicado:
-%%%% obter_controles([X,Y,ANGLE,S1,S2,S3,S4,S5,S6,SCORE], [FORWARD, REVERSE, LEFT, RIGHT, BOOM]) :- ...
-
-troca(0, 1).
-troca(1, 0).
-% [FORWARD, REVERSE, LEFT, RIGHT, BOOM]
-obter_controles([X,Y,ANGLE,S1,S2,S3,S4,S5,S6,SCORE], [FORWARD, REVERSE, LEFT, RIGHT, BOOM]) :-
-    random_between(0,1,AA),
-    troca(AA, BB),
-    random_between(0,1,CC),
-    FORWARD is AA,
-    REVERSE is BB,
-    LEFT is AA,
-    RIGHT is BB,
-    BOOM is CC.
-
-% Para evitar erros, o tanque para:
-obter_controles(_, [0,0,0,0,0]).
-```
-
-Assim, você deve apagar as regras acima e escrever as regras ``obter_controles``. Essa regra deve sempre receber os sensores e retornar 5 ações. Assim, ela deve sempre seguir esse padrão:
-```prolog
-obter_controles([X,Y,ANGLE,S1,S2,S3,S4,S5,S6,SCORE], [FORWARD, REVERSE, LEFT, RIGHT, BOOM]) :-
-```
-Claro que, além delas, você deve escrever todas as demais regras e fatos necessários para que o tanque se comporte bem no cenário apresentado.
-
-Have fun =)
+The first one is implemented in the `tanque0.pl` file
