@@ -2,16 +2,21 @@ import { Arena } from "../js/arena.js";
 import { Colors } from "../js/colors.js";
 import { Tank } from "../js/tank.js";
 import { Boom } from "../js/boom.js";
+import { Visualizer } from "../js/visualizer.js";
 //// não mexa nessas linhas:
 let windowHeight = $(window).height(),
   windowWidth = $(window).width(),
   lastUpdateScore = Date.now(),
   prologTankIDs = 0,
   timeForUpdatingProlog = 200;
-const canvas = document.getElementById("myCanvas");
-canvas.width = 800; //windowWidth;
-canvas.height = 600; //windowHeight;
-const ctx = canvas.getContext("2d");
+const tankCanvas = document.getElementById("tankCanvas");
+const neuralCanvas = document.getElementById("neuralCanvas");
+tankCanvas.width = 800; //windowWidth;
+tankCanvas.height = 600; //windowHeight;
+neuralCanvas.width = 600; //windowWidth;
+neuralCanvas.height = 600; //windowWidth;
+const carCtx = tankCanvas.getContext("2d");
+const neuralCtx = neuralCanvas.getContext("2d");
 //prettier-ignore
 const dummyTunkNames = /*from chatGPT*/ [
   "Boladão", "Rabugento", "Trovão", "Bagunceiro", "Marrento", "Trambiqueiro", "Espertinho",
@@ -35,25 +40,27 @@ const dummyTunkNames = /*from chatGPT*/ [
 //// Essa área pode ser configurada por você, mas aconselho não trocar o speed, arenaPadding e tamanho dos tanques.
 const speed = 1.5,
   arenaPadding = 10,
-  tankW = 90,
+  tankW = 50,
   tankH = 30,
   score = 100, // vida de cada tanque
   dummyTanks = 0, // quantidade de tanques aleatórios
+  aiTank = true, // modifique para ter um tanque controlado pelo teclado
   keysTank = true, // modifique para ter um tanque controlado pelo teclado
   // nome dos tanques controlados por Prolog (obs.: tem que adaptar o servidor.pl ao mexer aqui)
   // a quantidade é referente a quantidade de nomes, na falta de criatividade, o nome pode repetir... rs
   // exemplos de dois:
   //prologTanks=["Ligerin", "ApagaFogo"], // se quiser colocar dois tanques proloog, faça assim
   //prologTanks=["Ligerin"], // escolha aqui o nome de seu tanque controlado por prolog
-  prologTanks = ["tanque0"], //se não quiser nenhum tanque prolog, faça assim
+  prologTanks = [], //se não quiser nenhum tanque prolog, faça assim
   showSensors = true, //modifique para mostrar os sensores dos tanques PROLOG e KEYS
   showSensorsOfDummyTanks = false; //modifique para mostrar os sensores dos tanques DUMMY
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //// Não mexa daqui para baixo:
-const arena = new Arena(canvas.height, canvas.width, arenaPadding),
+const arena = new Arena(tankCanvas.height, tankCanvas.width, arenaPadding),
   _colors = new Colors(0);
 const tanks = [];
+if (aiTank) tanks.push(newTank("AI"));
 if (keysTank) tanks.push(newTank("KEYS"));
 for (const _ of prologTanks) {
   tanks.push(newTank("PROLOG"));
@@ -88,14 +95,17 @@ function newTank(controls = "DUMMY") {
     case "KEYS":
       name = "Humano";
       break;
+    case "AI":
+      name = "AI";
+      break;
   }
   return new Tank(
     pos.x,
     pos.y,
     tankH,
     tankW,
-    canvas.height,
-    canvas.width,
+    tankCanvas.height,
+    tankCanvas.width,
     arenaPadding,
     controls,
     speed,
@@ -110,10 +120,10 @@ function newTank(controls = "DUMMY") {
 function getPosition() {
   let tankPadding = arenaPadding + Math.max(tankH, tankW);
   let x = parseInt(
-      Math.random() * (canvas.width - tankPadding * 2) + tankPadding
+      Math.random() * (tankCanvas.width - tankPadding * 2) + tankPadding
     ),
     y = parseInt(
-      Math.random() * (canvas.height - tankPadding * 2) + tankPadding
+      Math.random() * (tankCanvas.height - tankPadding * 2) + tankPadding
     );
   return { x: x, y: y };
 }
@@ -208,28 +218,33 @@ function animate() {
 
   updateCanvas();
 
-  ctx.save();
-  arena.draw(ctx);
+  carCtx.save();
+  arena.draw(carCtx);
 
   for (let i = 0; i < tanks.length; i++) {
     if (tanks[i].controlType == "DUMMY") {
-      tanks[i].draw(ctx, showSensorsOfDummyTanks);
+      tanks[i].draw(carCtx, showSensorsOfDummyTanks);
     } else {
-      if (i == 0) {
-        tanks[i].draw(ctx, showSensors, "grey");
-      }
-      if (tanks[i].name == "tanque0") {
-        tanks[i].draw(ctx, showSensors, "red");
-      } else {
-        tanks[i].draw(ctx, false);
+      switch (tanks[i].name) {
+        case "Humano":
+          tanks[i].draw(carCtx, showSensors, "grey");
+          break;
+        case "AI":
+          tanks[i].draw(carCtx, showSensors, "green");
+          break;
+        case "tanque0":
+          tanks[i].draw(carCtx, false, "red");
+          break;
+        default:
+          tanks[i].draw(carCtx, false);
       }
     }
   }
   for (let i = 0; i < allBOOMS.length; i++) {
-    if (allBOOMS[i] != undefined) allBOOMS[i].draw(ctx);
+    if (allBOOMS[i] != undefined) allBOOMS[i].draw(carCtx);
   }
 
-  ctx.restore();
+  carCtx.restore();
 
   if (runFinished) {
     scores = getScores();
@@ -237,6 +252,10 @@ function animate() {
     updateScoresDiv = function () {};
     $("#kmdiv").show();
   } else {
+    const tankAi = tanks.find((tank) => tank.controlType == "AI");
+    if (tankAi) {
+      Visualizer.drawNeural(neuralCtx, tankAi.brain);
+    }
     requestAnimationFrame(animate);
   }
 }

@@ -1,6 +1,7 @@
 import { Sensor } from "./sensor.js";
 import { Controls } from "./controls.js";
 import { polysIntersect } from "./utils.js";
+import { NeuralNetwork } from "./network.js";
 export class Tank {
   constructor(
     x,
@@ -41,9 +42,10 @@ export class Tank {
     this.smallSteps = 0;
     this.damage = false;
     this.sensor = new Sensor(this);
+    this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 4]);
     this.score = score;
     this.lastDamage = Date.now();
-
+    this.useBrain = controlType == "AI";
     this.controls = new Controls(controlType, timeForUpdateProlog);
     this.polygon = this.#createPolygon();
 
@@ -112,6 +114,16 @@ export class Tank {
     }
     if (this.sensor) {
       this.sensor.update(arenaBorders, tanks);
+      const offsets = this.sensor.readings.map((s) =>
+        s == null ? 0 : 1 - s.offset
+      );
+      const outputs = NeuralNetwork.feedForward(offsets, this.brain);
+      if (this.useBrain) {
+        this.controls.forward = outputs[0];
+        this.controls.left = outputs[1];
+        this.controls.right = outputs[2];
+        this.controls.reverse = outputs[3];
+      }
     }
 
     let boom = this.controls.getBOOM() && this.score > 0;
