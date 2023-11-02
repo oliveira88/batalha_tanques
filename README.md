@@ -8,7 +8,7 @@ The HTML/JS/CSS part was built on top of last year's project, [Prolog Racing](ht
 
 The objective of this project is to control a tank using Prolog code ([SWI-Prolog](https://www.swi-prolog.org/)) so that it becomes the last one standing. After that, a classroom competition will also take place with all the projects.
 
-<p align="center"><img src="screenshot-all.png"></p>
+<p align="center"><img src="src/docs/screenshot-all.png"></p>
 
 Rules:
 * Each tank can fire one bullet per second.
