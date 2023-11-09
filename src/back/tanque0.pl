@@ -29,15 +29,25 @@
 troca(0, 1).
 troca(1, 0).
 % [FORWARD, REVERSE, LEFT, RIGHT, BOOM]
-
-obter_controles([X,Y,ANGLE,E1,E2,C3,D4,D5,R6,SCORE], [FORWARD, REVERSE, LEFT, RIGHT, BOOM]) :-
-%deve girar procurando algum inimigo para atirar e assim que achar, atirar
-    SCORE > 0,
-    BOOM is 1,
-    FORWARD is 0,
+obter_controles([X,Y,ANGLE,S1,S2,S3,S4,S5,S6,SCORE], [FORWARD, REVERSE, LEFT, RIGHT, BOOM]) :-
+    move,
+    shoot,
+    avoid_collision,
+    detect_enemy,
+    FORWARD is 1,
     REVERSE is 0,
-    LEFT is 0,
-    RIGHT is 0.
+    LEFT is 1,
+    RIGHT is 0,
+    BOOM is 1.
+
+%obter_controles([X,Y,ANGLE,E1,E2,C3,D4,D5,R6,SCORE], [FORWARD, REVERSE, LEFT, RIGHT, BOOM]) :-
+%deve girar procurando algum inimigo para atirar e assim que achar, atirar
+    % SCORE > 0,
+    % FORWARD is 0,
+    % BOOM is 1,
+    % REVERSE is 1,
+    % LEFT is 0,
+    % RIGHT is 0.
 
 % % Para evitar erros, o tanque para:
 obter_controles(_, [0,0,0,0,0]).

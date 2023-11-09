@@ -11,11 +11,11 @@ let windowHeight = $(window).height(),
   timeForUpdatingProlog = 200;
 const tankCanvas = document.getElementById("tankCanvas");
 const neuralCanvas = document.getElementById("neuralCanvas");
-tankCanvas.width = 800; //windowWidth;
-tankCanvas.height = 600; //windowHeight;
+tankCanvas.width = 1200; //windowWidth;
+tankCanvas.height = 900; //windowHeight;
 neuralCanvas.width = 600; //windowWidth;
 neuralCanvas.height = 600; //windowWidth;
-const carCtx = tankCanvas.getContext("2d");
+const tankCtx = tankCanvas.getContext("2d");
 const neuralCtx = neuralCanvas.getContext("2d");
 //prettier-ignore
 const dummyTunkNames = /*from chatGPT*/ [
@@ -43,40 +43,49 @@ const speed = 1.5,
   tankW = 50,
   tankH = 30,
   score = 100, // vida de cada tanque
-  dummyTanks = 0, // quantidade de tanques aleatórios
-  aiTank = true, // modifique para ter um tanque controlado pelo teclado
-  keysTank = true, // modifique para ter um tanque controlado pelo teclado
+  dummyTanks = 15, // quantidade de tanques aleatórios
+  aiTank = false, // modifique para ter um tanque controlado pelo teclado
+  keysTank = true,
+  showNeural = false,
+  numberOfAITanks = 15, // modifique para ter um tanque controlado pelo teclado
   // nome dos tanques controlados por Prolog (obs.: tem que adaptar o servidor.pl ao mexer aqui)
   // a quantidade é referente a quantidade de nomes, na falta de criatividade, o nome pode repetir... rs
   // exemplos de dois:
   //prologTanks=["Ligerin", "ApagaFogo"], // se quiser colocar dois tanques proloog, faça assim
   //prologTanks=["Ligerin"], // escolha aqui o nome de seu tanque controlado por prolog
-  prologTanks = [], //se não quiser nenhum tanque prolog, faça assim
+  prologTanks = ["tanque0"], //se não quiser nenhum tanque prolog, faça assim
   showSensors = true, //modifique para mostrar os sensores dos tanques PROLOG e KEYS
   showSensorsOfDummyTanks = false; //modifique para mostrar os sensores dos tanques DUMMY
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+if (showNeural) {
+  $("#neuralCanvas").show();
+} else {
+  $("#neuralCanvas").hide();
+}
 //// Não mexa daqui para baixo:
-const arena = new Arena(tankCanvas.height, tankCanvas.width, arenaPadding),
-  _colors = new Colors(0);
+const arena = new Arena(tankCanvas.height, tankCanvas.width, arenaPadding);
+const _colors = new Colors(0);
 const tanks = [];
-if (aiTank) tanks.push(newTank("AI"));
-if (keysTank) tanks.push(newTank("KEYS"));
+if (aiTank) {
+  tanks.push(...generateTanks(numberOfAITanks));
+}
+let bestTank = tanks[0];
+restore();
+if (keysTank) tanks.push(newTank("KEYS", showSensors));
 for (const _ of prologTanks) {
-  tanks.push(newTank("PROLOG"));
+  tanks.push(newTank("PROLOG", showSensors));
 }
 for (let i = 0; i < dummyTanks; i++) {
-  tanks.push(newTank("DUMMY"));
+  tanks.push(newTank("DUMMY", showSensorsOfDummyTanks));
 }
 
-let allBOOMS = new Array(),
-  lastBullet = new Array(tanks.length);
-for (let i = 0; i < lastBullet.length; i++) lastBullet[i] = 0;
+let allBOOMS = new Array();
+let lastBullet = new Array(tanks.length).fill(0);
 
 animate();
 
 // controls: ["DUMMY", "KEYS", "PROLOG"]
-function newTank(controls = "DUMMY") {
+function newTank(controls = "DUMMY", showSensor) {
   let pos = getPosition(),
     name,
     id = -1;
@@ -113,7 +122,8 @@ function newTank(controls = "DUMMY") {
     score,
     controls == "PROLOG" ? id : -1,
     name,
-    timeForUpdatingProlog
+    timeForUpdatingProlog,
+    showSensor
   );
 }
 
@@ -218,33 +228,38 @@ function animate() {
 
   updateCanvas();
 
-  carCtx.save();
-  arena.draw(carCtx);
+  tankCtx.save();
+  arena.draw(tankCtx);
 
   for (let i = 0; i < tanks.length; i++) {
     if (tanks[i].controlType == "DUMMY") {
-      tanks[i].draw(carCtx, showSensorsOfDummyTanks);
+      tankCtx.globalAlpha = 0.2;
+      tanks[i].draw(tankCtx);
     } else {
       switch (tanks[i].name) {
         case "Humano":
-          tanks[i].draw(carCtx, showSensors, "grey");
+          tankCtx.globalAlpha = 1;
+          tanks[i].draw(tankCtx, "grey");
           break;
         case "AI":
-          tanks[i].draw(carCtx, showSensors, "green");
+          tankCtx.globalAlpha = 0.2;
+          tanks[i].draw(tankCtx, "green");
+          tanks[i].showSensor = false;
           break;
         case "tanque0":
-          tanks[i].draw(carCtx, false, "red");
+          tankCtx.globalAlpha = 0.2;
+          tanks[i].draw(tankCtx, "red");
           break;
         default:
-          tanks[i].draw(carCtx, false);
+          tanks[i].draw(tankCtx);
       }
     }
   }
   for (let i = 0; i < allBOOMS.length; i++) {
-    if (allBOOMS[i] != undefined) allBOOMS[i].draw(carCtx);
+    if (allBOOMS[i] != undefined) allBOOMS[i].draw(tankCtx);
   }
 
-  carCtx.restore();
+  tankCtx.restore();
 
   if (runFinished) {
     scores = getScores();
@@ -252,10 +267,38 @@ function animate() {
     updateScoresDiv = function () {};
     $("#kmdiv").show();
   } else {
-    const tankAi = tanks.find((tank) => tank.controlType == "AI");
-    if (tankAi) {
-      Visualizer.drawNeural(neuralCtx, tankAi.brain);
+    const bestTank = tanks.find(
+      (tank) =>
+        tank.controlType == "AI" &&
+        tank.score == Math.max(...tanks.map((tank) => tank.score))
+    );
+    if (bestTank) {
+      tankCtx.globalAlpha = 1;
+      bestTank.showSensor = true;
+      bestTank.draw(tankCtx, "green");
+      Visualizer.drawNeural(neuralCtx, bestTank.brain);
     }
     requestAnimationFrame(animate);
+  }
+}
+
+function generateTanks(size) {
+  const tanks = [];
+  for (let i = 1; i < size; i++) {
+    tanks.push(newTank("AI", false));
+  }
+  return tanks;
+}
+
+window.save = function save() {
+  localStorage.setItem("bestTank", JSON.stringify(bestTank.brain));
+};
+window.discard = function discard() {
+  localStorage.removeItem("bestTank");
+};
+
+function restore() {
+  if (localStorage.getItem("bestTank")) {
+    bestTank.brain = JSON.parse(localStorage.getItem("bestTank"));
   }
 }

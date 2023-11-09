@@ -17,7 +17,8 @@ export class Tank {
     score = 100,
     prologID = -1,
     name = "Humano",
-    timeForUpdateProlog = 100
+    timeForUpdateProlog = 100,
+    showSensor = false
   ) {
     this.x = x;
     this.y = y;
@@ -25,7 +26,7 @@ export class Tank {
     this.height = height;
     this.name = name;
     this.color = color;
-
+    this.showSensor = showSensor;
     this.prologID = prologID;
     this.arenaleft = padding;
     this.arenatop = padding;
@@ -266,7 +267,7 @@ export class Tank {
     }
   }
 
-  draw(ctx, drawSensor = false, color = "yellow") {
+  draw(ctx, color = "yellow") {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(-this.angle);
@@ -291,7 +292,7 @@ export class Tank {
     ctx.fillText("" + this.score, -this.width / 4, this.height / 3);
     ctx.restore();
 
-    if (this.sensor && drawSensor) {
+    if (this.sensor && this.showSensor) {
       this.sensor.draw(ctx, color);
     }
   }
